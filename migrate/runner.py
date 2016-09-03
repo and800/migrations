@@ -1,7 +1,7 @@
 import time
 import os
 
-migrations_dir = 'migration_scripts/'
+migrations_dir = 'migrations/'
 
 
 def create(name):
