@@ -2,14 +2,15 @@ import time
 import os
 import json
 import fnmatch
+from importlib import util as import_util
 
-migrations_dir = 'migrations/'
-state_file = migrations_dir + '.state.json'
-state = None
+migrations_dir_ = 'migrations/'
+state_file_ = migrations_dir_ + '.state'
 
 
-def create(name):
-    template = """\
+def create(name, migrations_dir=migrations_dir_, template_file=None):
+    if template_file is None:
+        template = """\
 def up():
     pass
 
@@ -17,37 +18,101 @@ def up():
 def down():
     pass
 """
+    else:
+        with open(template_file, 'r') as file:
+            template = file.read()
+
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
-    now = str(int(time.time()))
-    filename = '{}_{}'.format(now, name.replace(' ', '_'))
-    with open('{}{}.py'.format(migrations_dir, filename), 'w') as file:
+    with open('{path}{time}_{name}.py'.format(
+        path=migrations_dir,
+        time=str(int(time.time())),
+        name=name.replace(' ', '_')
+    ), 'w') as file:
         file.write(template)
 
 
-# def perform(direction='up', name=None):
-#     get_state()
+def perform(
+        direction='up',
+        target=None,
+        migrations_dir=migrations_dir_,
+        state_file=state_file_):
+
+    available = get_all_migrations(migrations_dir)
+    performed = get_performed_migrations(state_file)
+    migrations = get_migrations(available, performed, direction, target)
+
+    for migration in migrations:
+        run(migration, migrations_dir, direction)
+
+    set_state(direction, performed, migrations, state_file)
 
 
-def get_state():
-    global state
+def get_all_migrations(migrations_dir):
     available = [
         file
         for file in os.listdir(migrations_dir)
         if fnmatch.fnmatch(file, '*.py')
     ]
-    available.sort(key=lambda name: int(name.split('_', maxsplit=1)[0]))
+    available.sort()
+    return available
+
+
+def get_performed_migrations(state_file):
     try:
         with open(state_file, 'r') as file:
-            performed = json.load(file)
+            return json.load(file)
     except FileNotFoundError:
-        performed = []
-    state = [(file, file in performed) for file in available]
+        return []
 
 
-def set_state():
+def get_migrations(available, performed, direction, target):
+    for index, performed_item in enumerate(performed):
+        if performed_item != available[index]:
+            raise Exception('migration order is corrupt')
+
+    if direction == 'down':
+        migrations = performed.reverse()
+    elif direction == 'up':
+        migrations = available[len(performed):]
+    else:
+        raise Exception()
+
+    if target is None:
+        return migrations
+    if isinstance(target, int) and target > 0:
+        migrations = migrations[:target]
+    elif isinstance(target, str):
+        for index, migration in enumerate(migrations):
+            if migration == target:
+                break
+        else:
+            raise Exception()
+        migrations = migrations[:index + 1]
+    else:
+        raise Exception()
+
+    return migrations
+
+
+def run(name, directory, direction):
+    import_spec = import_util.spec_from_file_location(
+        name,
+        directory + name
+    )
+    module = import_util.module_from_spec(import_spec)
+    import_spec.loader.exec_module(module)
+
+    getattr(module, direction)()
+
+
+def set_state(direction, old_state, migrations, state_file):
+    if direction == 'down':
+        state = old_state[:-len(migrations)]
+    else:
+        state = old_state + migrations
     with open(state_file, 'w') as file:
         json.dump(
-            [name for name, performed in state if performed],
+            state,
             file,
             indent=2
         )
