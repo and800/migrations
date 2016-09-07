@@ -40,7 +40,7 @@ def perform(
     if direction is not 'up' and direction is not 'down':
         raise _MigrationError('direction is invalid')
 
-    if isinstance(target, int) or target.isdecimal():
+    if isinstance(target, str) and target.isdecimal():
         target = int(target)
 
     available = _get_all_migrations(migrations_dir)
