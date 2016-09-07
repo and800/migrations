@@ -48,13 +48,16 @@ def perform(
 
 
 def get_all_migrations(migrations_dir):
-    available = [
-        file
-        for file in os.listdir(migrations_dir)
-        if fnmatch.fnmatch(file, '*.py')
-    ]
-    available.sort()
-    return available
+    try:
+        available = [
+            file
+            for file in os.listdir(migrations_dir)
+            if fnmatch.fnmatch(file, '*.py')
+        ]
+        available.sort()
+        return available
+    except FileNotFoundError as e:
+        raise Exception('no migrations found') from e
 
 
 def get_performed_migrations(state_file):
@@ -71,7 +74,8 @@ def get_migrations(available, performed, direction, target):
             raise Exception('migration order is corrupt')
 
     if direction == 'down':
-        migrations = performed.reverse()
+        migrations = performed.copy()
+        migrations.reverse()
     elif direction == 'up':
         migrations = available[len(performed):]
     else:
