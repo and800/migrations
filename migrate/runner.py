@@ -71,7 +71,7 @@ def _get_performed_migrations(state_file):
 def _get_migrations(available, performed, direction, target):
     for index, performed_item in enumerate(performed):
         if performed_item != available[index]:
-            raise Exception('migration order is corrupt')
+            raise _MigrationError('migration order is corrupt')
 
     if direction == 'down':
         migrations = performed.copy()
@@ -90,7 +90,7 @@ def _get_migrations(available, performed, direction, target):
             if migration == target:
                 break
         else:
-            raise Exception()
+            raise _MigrationError('migration with provided name not found')
         migrations = migrations[:index + 1]
     else:
         raise Exception()
@@ -120,3 +120,9 @@ def _set_state(direction, old_state, migrations, state_file):
             file,
             indent=2
         )
+
+
+class _MigrationError(Exception):
+    def __init__(self, message, *args):
+        super(_MigrationError, self).__init__(message, *args)
+        self.message = message
