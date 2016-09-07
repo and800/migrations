@@ -37,6 +37,12 @@ def perform(
         migrations_dir=migrations_dir_,
         state_file=state_file_):
 
+    if direction is not 'up' and direction is not 'down':
+        raise _MigrationError('direction is invalid')
+
+    if isinstance(target, int) or target.isdecimal():
+        target = int(target)
+
     available = _get_all_migrations(migrations_dir)
     performed = _get_performed_migrations(state_file)
     migrations = _get_migrations(available, performed, direction, target)
@@ -57,7 +63,7 @@ def _get_all_migrations(migrations_dir):
         available.sort()
         return available
     except FileNotFoundError as e:
-        raise Exception('no migrations found') from e
+        raise _MigrationError('no migrations found') from e
 
 
 def _get_performed_migrations(state_file):
@@ -76,24 +82,20 @@ def _get_migrations(available, performed, direction, target):
     if direction == 'down':
         migrations = performed.copy()
         migrations.reverse()
-    elif direction == 'up':
-        migrations = available[len(performed):]
     else:
-        raise Exception()
+        migrations = available[len(performed):]
 
     if target is None:
         return migrations
     if isinstance(target, int) and target > 0:
         migrations = migrations[:target]
-    elif isinstance(target, str):
+    else:
         for index, migration in enumerate(migrations):
             if migration == target:
                 break
         else:
             raise _MigrationError('migration with provided name not found')
         migrations = migrations[:index + 1]
-    else:
-        raise Exception()
 
     return migrations
 
