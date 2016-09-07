@@ -37,17 +37,17 @@ def perform(
         migrations_dir=migrations_dir_,
         state_file=state_file_):
 
-    available = get_all_migrations(migrations_dir)
-    performed = get_performed_migrations(state_file)
-    migrations = get_migrations(available, performed, direction, target)
+    available = _get_all_migrations(migrations_dir)
+    performed = _get_performed_migrations(state_file)
+    migrations = _get_migrations(available, performed, direction, target)
 
     for migration in migrations:
-        run(migration, migrations_dir, direction)
+        _run(migration, migrations_dir, direction)
 
-    set_state(direction, performed, migrations, state_file)
+    _set_state(direction, performed, migrations, state_file)
 
 
-def get_all_migrations(migrations_dir):
+def _get_all_migrations(migrations_dir):
     try:
         available = [
             file
@@ -60,7 +60,7 @@ def get_all_migrations(migrations_dir):
         raise Exception('no migrations found') from e
 
 
-def get_performed_migrations(state_file):
+def _get_performed_migrations(state_file):
     try:
         with open(state_file, 'r') as file:
             return json.load(file)
@@ -68,7 +68,7 @@ def get_performed_migrations(state_file):
         return []
 
 
-def get_migrations(available, performed, direction, target):
+def _get_migrations(available, performed, direction, target):
     for index, performed_item in enumerate(performed):
         if performed_item != available[index]:
             raise Exception('migration order is corrupt')
@@ -98,7 +98,7 @@ def get_migrations(available, performed, direction, target):
     return migrations
 
 
-def run(name, directory, direction):
+def _run(name, directory, direction):
     import_spec = import_util.spec_from_file_location(
         name,
         directory + name
@@ -109,7 +109,7 @@ def run(name, directory, direction):
     getattr(module, direction)()
 
 
-def set_state(direction, old_state, migrations, state_file):
+def _set_state(direction, old_state, migrations, state_file):
     if direction == 'down':
         state = old_state[:-len(migrations)]
     else:
