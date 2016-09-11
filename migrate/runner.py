@@ -41,7 +41,9 @@ def perform(
         raise _MigrationError('direction {} is invalid'.format(direction))
 
     if isinstance(target, str) and target.isdecimal():
-        target = int(target)
+        number = int(target)
+        if number > 0:
+            target = number
 
     available = _get_all_migrations(migrations_dir)
     performed = _get_performed_migrations(state_file)
@@ -86,8 +88,10 @@ def _get_migrations(available, performed, direction, target):
         migrations = available[len(performed):]
 
     if target is None:
+        if direction == 'down':
+            return migrations[:1]
         return migrations
-    if isinstance(target, int) and target > 0:
+    if isinstance(target, int):
         migrations = migrations[:target]
     else:
         for index, migration in enumerate(migrations):
