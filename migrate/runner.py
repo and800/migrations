@@ -86,6 +86,8 @@ def _get_migrations(available, performed, direction, target):
         migrations = available[len(performed):]
 
     if target is None:
+        if direction == 'down':
+            return migrations[:1]
         return migrations
     if isinstance(target, int) and target > 0:
         migrations = migrations[:target]
