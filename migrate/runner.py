@@ -37,8 +37,8 @@ def perform(
         migrations_dir=migrations_dir_,
         state_file=state_file_):
 
-    if direction is not 'up' and direction is not 'down':
-        raise _MigrationError('direction is invalid')
+    if direction != 'up' and direction != 'down':
+        raise _MigrationError('direction {} is invalid'.format(direction))
 
     if isinstance(target, str) and target.isdecimal():
         target = int(target)
@@ -94,7 +94,9 @@ def _get_migrations(available, performed, direction, target):
             if migration == target:
                 break
         else:
-            raise _MigrationError('migration with provided name not found')
+            raise _MigrationError(
+                'migration with provided name {} not found'.format(target)
+            )
         migrations = migrations[:index + 1]
 
     return migrations
