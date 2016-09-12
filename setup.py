@@ -13,4 +13,7 @@ setup(
     author_email='andriy.maletsky@gmail.com',
     license='MIT',
     packages=['migrate'],
+    entry_points=dict(
+        console_scripts=['migrate = migrate.cli:entrypoint'],
+    ),
 )
