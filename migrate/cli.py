@@ -1,8 +1,12 @@
 import argparse
+import sys
+import os
 from . import runner
 
 
 def entrypoint():
+    sys.path.insert(0, os.getcwd())
+
     parser = _configure_parser()
     args = vars(parser.parse_args())
 
