@@ -1,0 +1,5 @@
+pip~=8.1
+setuptools~=26.1
+wheel~=0.29
+twine~=1.8
+pylint~=1.6
