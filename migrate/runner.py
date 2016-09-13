@@ -2,6 +2,7 @@ import time
 import os
 import json
 import fnmatch
+import sys
 from importlib import util as import_util
 
 migrations_dir_ = 'migrations/'
@@ -21,6 +22,10 @@ def down():
     else:
         with open(template_file, 'r') as file:
             template = file.read()
+
+    migrations_dir = (
+        lambda path: path if path[-1] == '/' else path + '/'
+    )(migrations_dir)
 
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
     with open('{path}{time}_{name}.py'.format(
@@ -45,12 +50,18 @@ def perform(
         if number > 0:
             target = number
 
+    migrations_dir = (
+        lambda path: path if path[-1] == '/' else path + '/'
+    )(migrations_dir)
+
     available = _get_all_migrations(migrations_dir)
     performed = _get_performed_migrations(state_file)
     migrations = _get_migrations(available, performed, direction, target)
 
+    sys.path.insert(0, os.getcwd())
     for migration in migrations:
         _run(migration, migrations_dir, direction)
+    del sys.path[0]
 
     _set_state(direction, performed, migrations, state_file)
 

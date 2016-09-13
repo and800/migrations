@@ -1,12 +1,8 @@
 import argparse
-import sys
-import os
-from . import runner
+from . import runner, __version__
 
 
 def entrypoint():
-    sys.path.insert(0, os.getcwd())
-
     parser = _configure_parser()
     args = vars(parser.parse_args())
 
@@ -33,6 +29,13 @@ def _configure_parser():
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
 
     parser.add_argument(
+        '-v', '--version',
+        help='show version and exit',
+        action='version',
+        version='migrations v' + __version__,
+    )
+
+    parser.add_argument(
         '-d', '--migrations-dir',
         help='directory where migrations are stored'
     )
@@ -42,7 +45,7 @@ def _configure_parser():
     )
     parser.add_argument(
         '-t', '--template-file',
-        help='location of template file for ner migrations'
+        help='location of template file for new migrations'
     )
 
     parser.add_argument(
@@ -55,19 +58,6 @@ def _configure_parser():
     parser.add_argument('spec', nargs='?', help='action specification')
 
     return parser
-
-
-# def _transform_args(args, mapping):
-#     result = {}
-#     for key, arg in args.items():
-#         if arg is None:
-#             continue
-#         try:
-#             key = mapping[key]
-#         except KeyError:
-#             pass
-#         result[key] = arg
-#     return result
 
 
 def _transform_args(args, mapping):
