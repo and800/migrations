@@ -22,6 +22,10 @@ def down():
         with open(template_file, 'r') as file:
             template = file.read()
 
+    migrations_dir = (
+        lambda path: path if path[-1] == '/' else path + '/'
+    )(migrations_dir)
+
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
     with open('{path}{time}_{name}.py'.format(
         path=migrations_dir,
@@ -44,6 +48,10 @@ def perform(
         number = int(target)
         if number > 0:
             target = number
+
+    migrations_dir = (
+        lambda path: path if path[-1] == '/' else path + '/'
+    )(migrations_dir)
 
     available = _get_all_migrations(migrations_dir)
     performed = _get_performed_migrations(state_file)
