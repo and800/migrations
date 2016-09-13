@@ -1,5 +1,5 @@
 import argparse
-from . import runner
+from . import runner, __version__
 
 
 def entrypoint():
@@ -29,6 +29,13 @@ def _configure_parser():
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
 
     parser.add_argument(
+        '-v', '--version',
+        help='show version and exit',
+        action='version',
+        version='migrations v' + __version__,
+    )
+
+    parser.add_argument(
         '-d', '--migrations-dir',
         help='directory where migrations are stored'
     )
@@ -38,7 +45,7 @@ def _configure_parser():
     )
     parser.add_argument(
         '-t', '--template-file',
-        help='location of template file for ner migrations'
+        help='location of template file for new migrations'
     )
 
     parser.add_argument(
