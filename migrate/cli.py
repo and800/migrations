@@ -1,12 +1,8 @@
 import argparse
-import sys
-import os
 from . import runner
 
 
 def entrypoint():
-    sys.path.insert(0, os.getcwd())
-
     parser = _configure_parser()
     args = vars(parser.parse_args())
 
@@ -55,19 +51,6 @@ def _configure_parser():
     parser.add_argument('spec', nargs='?', help='action specification')
 
     return parser
-
-
-# def _transform_args(args, mapping):
-#     result = {}
-#     for key, arg in args.items():
-#         if arg is None:
-#             continue
-#         try:
-#             key = mapping[key]
-#         except KeyError:
-#             pass
-#         result[key] = arg
-#     return result
 
 
 def _transform_args(args, mapping):
