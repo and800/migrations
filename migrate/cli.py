@@ -10,19 +10,19 @@ def entrypoint():
         args['action'] = 'up'
     try:
         if args['action'] == 'create':
-            method_args = _transform_args(args, {
-                'name': 'name',
-                'migrations_dir': 'migrations_dir',
-                'template_file': 'template_file',
-            })
+            method_args = _transform_args(args, [
+                'name',
+                'migrations_dir',
+                'template_file',
+            ])
             _runner.create(**method_args)
         else:
-            method_args = _transform_args(args, {
-                'action': 'direction',
-                'target': 'target',
-                'migrations_dir': 'migrations_dir',
-                'state_file': 'state_file',
-            })
+            method_args = _transform_args(args, [
+                ('action', 'direction'),
+                'target',
+                'migrations_dir',
+                'state_file',
+            ])
             _runner.perform(**method_args)
         return 0
     except _runner.MigrationError as e:
@@ -80,10 +80,14 @@ def _configure_parser():
     return parser
 
 
-def _transform_args(args, mapping):
+def _transform_args(args, required):
     result = {}
-    for then, now in mapping.items():
-        arg = args[then]
-        if arg is not None:
-            result[now] = arg
+    for required_arg in required:
+        if isinstance(required_arg, tuple):
+            then, now = required_arg
+            key, value = now, args[then]
+        else:  # type(required_arg) == str
+            key, value = required_arg, args[required_arg]
+        if value is not None:
+            result[key] = value
     return result
