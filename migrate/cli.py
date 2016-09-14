@@ -1,10 +1,11 @@
+import sys
 import argparse
 from . import _runner, __version__
 
 
-def entrypoint():
+def entrypoint(argv=sys.argv[1:]):
     parser = _configure_parser()
-    args = vars(parser.parse_args())
+    args = vars(parser.parse_args(argv))
 
     if 'action' not in args:
         args['action'] = 'up'
