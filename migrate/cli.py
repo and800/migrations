@@ -1,5 +1,5 @@
 import argparse
-from . import runner, __version__
+from . import _runner, __version__
 
 
 def entrypoint():
@@ -17,7 +17,7 @@ def entrypoint():
                 'migrations_dir': 'migrations_dir',
                 'template_file': 'template_file',
             })
-            runner.create(**method_args)
+            _runner.create(**method_args)
         else:
             method_args = _transform_args(args, {
                 'action': 'direction',
@@ -25,9 +25,9 @@ def entrypoint():
                 'migrations_dir': 'migrations_dir',
                 'state_file': 'state_file',
             })
-            runner.perform(**method_args)
+            _runner.perform(**method_args)
         return 0
-    except runner._MigrationError as e:
+    except _runner.MigrationError as e:
         return e
 
 
@@ -66,18 +66,16 @@ def _configure_parser():
     action_up = subparsers.add_parser('up')
     action_up.add_argument(
         'target', nargs='?',
-        help=
-        'name of the last migration or number of migrations'
-        '(by default perform all available)'
+        help='name of the last migration or number of migrations '
+             '(by default perform all available)'
     )
     action_up.set_defaults(action='up')
 
     action_down = subparsers.add_parser('down')
     action_down.add_argument(
         'target', nargs='?',
-        help=
-        'name of the last migration or number of migrations'
-        '(by default revert one)'
+        help='name of the last migration or number of migrations '
+             '(by default revert one)'
     )
     action_down.set_defaults(action='down')
 

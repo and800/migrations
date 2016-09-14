@@ -1,3 +1,3 @@
-from .runner import create, perform
-from .version import __version__
+from ._runner import create, perform
+from ._version import __version__
 __all__ = ['create', 'perform']
