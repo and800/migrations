@@ -3,7 +3,7 @@ from setuptools import setup
 with open('README.rst', 'r') as file:
     readme = file.read()
 
-with open('migrate/version.py', 'r') as file:
+with open('migrate/_version.py', 'r') as file:
     version_str = file.read()
 version_container = {}
 exec(version_str, version_container)
