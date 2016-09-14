@@ -10,10 +10,8 @@ def entrypoint():
         args['action'] = 'up'
     try:
         if args['action'] == 'create':
-            if args['spec'] is None:
-                raise Exception('name is not set')
             method_args = _transform_args(args, {
-                'spec': 'name',
+                'name': 'name',
                 'migrations_dir': 'migrations_dir',
                 'template_file': 'template_file',
             })
@@ -21,7 +19,7 @@ def entrypoint():
         else:
             method_args = _transform_args(args, {
                 'action': 'direction',
-                'spec': 'target',
+                'target': 'target',
                 'migrations_dir': 'migrations_dir',
                 'state_file': 'state_file',
             })
