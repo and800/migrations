@@ -6,6 +6,8 @@ def entrypoint():
     parser = _configure_parser()
     args = vars(parser.parse_args())
 
+    if 'action' not in args:
+        args['action'] = 'up'
     try:
         if args['action'] == 'create':
             if args['spec'] is None:
@@ -52,14 +54,32 @@ def _configure_parser():
         help='location of template file for new migrations'
     )
 
-    parser.add_argument(
-        'action',
-        choices=['up', 'down', 'create'],
-        help='action',
-        nargs='?',
-        default='up',
+    subparsers = parser.add_subparsers()
+
+    action_create = subparsers.add_parser('create')
+    action_create.add_argument(
+        'name',
+        help='name of new migration file'
     )
-    parser.add_argument('spec', nargs='?', help='action specification')
+    action_create.set_defaults(action='create')
+
+    action_up = subparsers.add_parser('up')
+    action_up.add_argument(
+        'target', nargs='?',
+        help=
+        'name of the last migration or number of migrations'
+        '(by default perform all available)'
+    )
+    action_up.set_defaults(action='up')
+
+    action_down = subparsers.add_parser('down')
+    action_down.add_argument(
+        'target', nargs='?',
+        help=
+        'name of the last migration or number of migrations'
+        '(by default revert one)'
+    )
+    action_down.set_defaults(action='down')
 
     return parser
 

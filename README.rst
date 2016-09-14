@@ -30,21 +30,21 @@ Usage
     usage: migrate [options] [action]
 
     actions:
-      up    [NAME|COUNT]    (default) perform COUNT migrations or till given NAME
-                            (by default performs all available)
-      down  [NAME|COUNT]    revert COUNT migrations or till given NAME
-                            (by default reverts one)
-      create NAME           create new migration file
+      up     [-h] [NAME|COUNT]   (default) perform COUNT migrations or till given NAME
+                                 (by default perform all available)
+      down   [-h] [NAME|COUNT]   revert COUNT migrations or till given NAME
+                                 (by default revert one)
+      create [-h]  NAME          create new migration file
 
     options:
-      -h, --help            show this help message and exit
-      -v, --version         show version and exit
+      -h, --help                 show this help message and exit
+      -v, --version              show version and exit
       -d PATH, --migrations-dir PATH
-                            directory where migrations are stored
+                                 directory where migrations are stored
       -s PATH, --state-file PATH
-                            location of file which stores database state
+                                 location of file which stores database state
       -t PATH, --template-file PATH
-                            location of template file for new migrations
+                                 location of template file for new migrations
 
 Each migration file must define functions :code:`up()` and :code:`down()`
 without required arguments.
