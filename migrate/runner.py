@@ -145,3 +145,6 @@ class _MigrationError(Exception):
     def __init__(self, message, *args):
         super(_MigrationError, self).__init__(message, *args)
         self.message = message
+
+    def __str__(self):
+        return 'Error: {}.'.format(self.message)

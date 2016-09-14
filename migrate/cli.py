@@ -6,23 +6,27 @@ def entrypoint():
     parser = _configure_parser()
     args = vars(parser.parse_args())
 
-    if args['action'] == 'create':
-        if args['spec'] is None:
-            raise Exception('name is not set')
-        method_args = _transform_args(args, {
-            'spec': 'name',
-            'migrations_dir': 'migrations_dir',
-            'template_file': 'template_file',
-        })
-        runner.create(**method_args)
-    else:
-        method_args = _transform_args(args, {
-            'action': 'direction',
-            'spec': 'target',
-            'migrations_dir': 'migrations_dir',
-            'state_file': 'state_file',
-        })
-        runner.perform(**method_args)
+    try:
+        if args['action'] == 'create':
+            if args['spec'] is None:
+                raise Exception('name is not set')
+            method_args = _transform_args(args, {
+                'spec': 'name',
+                'migrations_dir': 'migrations_dir',
+                'template_file': 'template_file',
+            })
+            runner.create(**method_args)
+        else:
+            method_args = _transform_args(args, {
+                'action': 'direction',
+                'spec': 'target',
+                'migrations_dir': 'migrations_dir',
+                'state_file': 'state_file',
+            })
+            runner.perform(**method_args)
+        return 0
+    except runner._MigrationError as e:
+        return e
 
 
 def _configure_parser():
