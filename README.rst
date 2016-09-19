@@ -4,6 +4,10 @@ Migrations
 Simple, cross-database migration tool for Python applications.
 Inspired by `node migrations <https://github.com/tj/node-migrate>`_.
 
+Status
+------
+The project is in alpha now. Bugs and breaking changes will occur.
+
 Requirements
 ------------
 Only Python 3 is supported for now.
