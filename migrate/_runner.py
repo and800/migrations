@@ -3,6 +3,7 @@ import os
 import json
 import fnmatch
 import sys
+import itertools
 from importlib import util as import_util
 
 migrations_dir_ = 'migrations/'
@@ -88,8 +89,11 @@ def get_performed_migrations(state_file):
 
 
 def get_migrations(available, performed, direction, target):
-    for index, performed_item in enumerate(performed):
-        if performed_item != available[index]:
+
+    for available_item, performed_item in itertools.zip_longest(
+        available, performed
+    ):
+        if available_item != performed_item and performed_item is not None:
             raise MigrationError('migration order is corrupt')
 
     if direction == 'down':
