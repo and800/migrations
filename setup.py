@@ -1,17 +1,20 @@
 from setuptools import setup
+import re
+
+
+def version():
+    with open('migrate/__init__.py', 'r') as file:
+        file_content = file.read()
+    pattern = r"""^__version__\s*=\s*['"]([^'"]*)['"]"""
+    return re.search(pattern, file_content, re.M).group(1)
+
 
 with open('README.rst', 'r') as file:
     readme = file.read()
 
-with open('migrate/_version.py', 'r') as file:
-    version_str = file.read()
-version_container = {}
-exec(version_str, version_container)
-version = version_container['__version__']
-
 setup(
     name='migrations',
-    version=version,
+    version=version(),
     description='Yet another Python migration tool',
     long_description=readme,
     url='https://github.com/and800/migrations',
