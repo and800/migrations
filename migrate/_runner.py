@@ -3,6 +3,7 @@ import os
 import json
 import fnmatch
 import sys
+import itertools
 from importlib import util as import_util
 
 migrations_dir_ = 'migrations/'
@@ -43,7 +44,7 @@ def perform(
         state_file=state_file_):
 
     if direction != 'up' and direction != 'down':
-        raise _MigrationError('direction {} is invalid'.format(direction))
+        raise MigrationError('direction {} is invalid'.format(direction))
 
     if isinstance(target, str) and target.isdecimal():
         number = int(target)
@@ -54,19 +55,19 @@ def perform(
         lambda path: path if path[-1] == '/' else path + '/'
     )(migrations_dir)
 
-    available = _get_all_migrations(migrations_dir)
-    performed = _get_performed_migrations(state_file)
-    migrations = _get_migrations(available, performed, direction, target)
+    available = get_all_migrations(migrations_dir)
+    performed = get_performed_migrations(state_file)
+    migrations = get_migrations(available, performed, direction, target)
 
     sys.path.insert(0, os.getcwd())
     for migration in migrations:
-        _run(migration, migrations_dir, direction)
+        run(migration, migrations_dir, direction)
     del sys.path[0]
 
-    _set_state(direction, performed, migrations, state_file)
+    set_state(direction, performed, migrations, state_file)
 
 
-def _get_all_migrations(migrations_dir):
+def get_all_migrations(migrations_dir):
     try:
         available = [
             file
@@ -76,10 +77,10 @@ def _get_all_migrations(migrations_dir):
         available.sort()
         return available
     except FileNotFoundError as e:
-        raise _MigrationError('no migrations found') from e
+        raise MigrationError('no migrations found') from e
 
 
-def _get_performed_migrations(state_file):
+def get_performed_migrations(state_file):
     try:
         with open(state_file, 'r') as file:
             return json.load(file)
@@ -87,10 +88,13 @@ def _get_performed_migrations(state_file):
         return []
 
 
-def _get_migrations(available, performed, direction, target):
-    for index, performed_item in enumerate(performed):
-        if performed_item != available[index]:
-            raise _MigrationError('migration order is corrupt')
+def get_migrations(available, performed, direction, target):
+
+    for available_item, performed_item in itertools.zip_longest(
+        available, performed
+    ):
+        if available_item != performed_item and performed_item is not None:
+            raise MigrationError('migration order is corrupt')
 
     if direction == 'down':
         migrations = performed.copy()
@@ -109,7 +113,7 @@ def _get_migrations(available, performed, direction, target):
             if migration == target:
                 break
         else:
-            raise _MigrationError(
+            raise MigrationError(
                 'migration with provided name {} not found'.format(target)
             )
         migrations = migrations[:index + 1]
@@ -117,7 +121,7 @@ def _get_migrations(available, performed, direction, target):
     return migrations
 
 
-def _run(name, directory, direction):
+def run(name, directory, direction):
     import_spec = import_util.spec_from_file_location(
         name,
         directory + name
@@ -128,7 +132,7 @@ def _run(name, directory, direction):
     getattr(module, direction)()
 
 
-def _set_state(direction, old_state, migrations, state_file):
+def set_state(direction, old_state, migrations, state_file):
     if direction == 'down':
         state = old_state[:-len(migrations)]
     else:
@@ -141,7 +145,10 @@ def _set_state(direction, old_state, migrations, state_file):
         )
 
 
-class _MigrationError(Exception):
+class MigrationError(Exception):
     def __init__(self, message, *args):
-        super(_MigrationError, self).__init__(message, *args)
+        super(MigrationError, self).__init__(message, *args)
         self.message = message
+
+    def __str__(self):
+        return 'Error: {}.'.format(self.message)
