@@ -85,10 +85,13 @@ def _transform_args(args, required):
     result = {}
     for required_arg in required:
         if isinstance(required_arg, tuple):
-            then, now = required_arg
-            key, value = now, args[then]
+            old_key, key = required_arg
         else:  # type(required_arg) == str
-            key, value = required_arg, args[required_arg]
+            old_key = key = required_arg
+        try:
+            value = args[old_key]
+        except KeyError:
+            value = None
         if value is not None:
             result[key] = value
     return result
