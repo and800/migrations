@@ -139,7 +139,7 @@ def run(name, directory, direction):
     print('{action} {name}...'.format(
         action='Reverting' if direction == 'down' else 'Applying',
         name=name,
-    ), end='')
+    ), end='', flush=True)
 
     action = getattr(module, direction)
     started = time.time()
