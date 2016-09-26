@@ -79,6 +79,25 @@ def perform(
     ))
 
 
+def show(migrations_dir=migrations_dir_, state_file=state_file_):
+    performed = get_performed_migrations(state_file)
+    new = get_all_migrations(migrations_dir)[len(performed):]
+
+    performed_header = 'Applied migrations:'
+    new_header = 'New migrations:'
+    print('\n'.join([
+        '-' * len(performed_header),
+        performed_header,
+        '-' * len(performed_header),
+        '\n'.join(performed),
+
+        '-' * len(new_header),
+        new_header,
+        '-' * len(new_header),
+        '\n'.join(new),
+    ]))
+
+
 def get_all_migrations(migrations_dir):
     try:
         available = [
