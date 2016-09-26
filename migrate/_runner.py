@@ -29,9 +29,9 @@ def down():
     )(migrations_dir)
 
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
-    filename = '{path}{time}_{name}.py'.format(
+    filename = '{path}{time:.0f}_{name}.py'.format(
         path=migrations_dir,
-        time=str(int(time.time())),
+        time=time.time(),
         name=name.replace(' ', '_')
     )
     with open(filename, 'w') as file:
@@ -136,12 +136,17 @@ def run(name, directory, direction):
     module = import_util.module_from_spec(import_spec)
     import_spec.loader.exec_module(module)
 
-    print('{action} {name}'.format(
+    print('{action} {name}...'.format(
         action='Reverting' if direction == 'down' else 'Applying',
         name=name,
-    ))
+    ), end='')
 
-    getattr(module, direction)()
+    action = getattr(module, direction)
+    started = time.time()
+    action()
+    duration = time.time() - started
+
+    print('done(time: {:.3f}s)'.format(duration))
 
 
 def set_state(direction, old_state, migrations, state_file):
