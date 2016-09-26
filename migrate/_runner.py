@@ -29,12 +29,14 @@ def down():
     )(migrations_dir)
 
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
-    with open('{path}{time}_{name}.py'.format(
+    filename = '{path}{time:.0f}_{name}.py'.format(
         path=migrations_dir,
-        time=str(int(time.time())),
+        time=time.time(),
         name=name.replace(' ', '_')
-    ), 'w') as file:
+    )
+    with open(filename, 'w') as file:
         file.write(template)
+    print('File \'{}\' has been created.'.format(filename))
 
 
 def perform(
@@ -59,12 +61,22 @@ def perform(
     performed = get_performed_migrations(state_file)
     migrations = get_migrations(available, performed, direction, target)
 
+    def run_and_show_time():
+        for migration in migrations:
+            yield run(migration, migrations_dir, direction)
+
     sys.path.insert(0, os.getcwd())
-    for migration in migrations:
-        run(migration, migrations_dir, direction)
+    total_time = sum(
+        run_and_show_time()
+    )
     del sys.path[0]
 
     set_state(direction, performed, migrations, state_file)
+
+    print('\nMigrations have been {action}. Total time: {time:.3f}s'.format(
+        action='reverted' if direction == 'down' else 'applied',
+        time=total_time
+    ))
 
 
 def get_all_migrations(migrations_dir):
@@ -129,7 +141,18 @@ def run(name, directory, direction):
     module = import_util.module_from_spec(import_spec)
     import_spec.loader.exec_module(module)
 
-    getattr(module, direction)()
+    print('{action} {name}...'.format(
+        action='Reverting' if direction == 'down' else 'Applying',
+        name=name,
+    ), end='', flush=True)
+
+    action = getattr(module, direction)
+    started = time.time()
+    action()
+    duration = time.time() - started
+
+    print('done(time: {:.3f}s)'.format(duration))
+    return duration
 
 
 def set_state(direction, old_state, migrations, state_file):
