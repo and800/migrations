@@ -29,12 +29,14 @@ def down():
     )(migrations_dir)
 
     os.makedirs(migrations_dir, 0o775, exist_ok=True)
-    with open('{path}{time}_{name}.py'.format(
+    filename = '{path}{time}_{name}.py'.format(
         path=migrations_dir,
         time=str(int(time.time())),
         name=name.replace(' ', '_')
-    ), 'w') as file:
+    )
+    with open(filename, 'w') as file:
         file.write(template)
+    print('File \'{}\' has been created.'.format(filename))
 
 
 def perform(
@@ -65,6 +67,11 @@ def perform(
     del sys.path[0]
 
     set_state(direction, performed, migrations, state_file)
+
+    print()
+    print('Migrations have been {action}.'.format(
+        action='reverted' if direction == 'down' else 'applied'
+    ))
 
 
 def get_all_migrations(migrations_dir):
@@ -128,6 +135,11 @@ def run(name, directory, direction):
     )
     module = import_util.module_from_spec(import_spec)
     import_spec.loader.exec_module(module)
+
+    print('{action} {name}'.format(
+        action='Reverting' if direction == 'down' else 'Applying',
+        name=name,
+    ))
 
     getattr(module, direction)()
 
