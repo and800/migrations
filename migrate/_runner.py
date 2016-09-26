@@ -61,16 +61,21 @@ def perform(
     performed = get_performed_migrations(state_file)
     migrations = get_migrations(available, performed, direction, target)
 
+    def run_and_show_time():
+        for migration in migrations:
+            yield run(migration, migrations_dir, direction)
+
     sys.path.insert(0, os.getcwd())
-    for migration in migrations:
-        run(migration, migrations_dir, direction)
+    total_time = sum(
+        run_and_show_time()
+    )
     del sys.path[0]
 
     set_state(direction, performed, migrations, state_file)
 
-    print()
-    print('Migrations have been {action}.'.format(
-        action='reverted' if direction == 'down' else 'applied'
+    print('\nMigrations have been {action}. Total time: {time:.3f}s'.format(
+        action='reverted' if direction == 'down' else 'applied',
+        time=total_time
     ))
 
 
@@ -147,6 +152,7 @@ def run(name, directory, direction):
     duration = time.time() - started
 
     print('done(time: {:.3f}s)'.format(duration))
+    return duration
 
 
 def set_state(direction, old_state, migrations, state_file):
