@@ -59,6 +59,7 @@ def perform(
 
     available = get_all_migrations(migrations_dir)
     performed = get_performed_migrations(state_file)
+    check_integrity(available, performed)
     migrations = get_migrations(available, performed, direction, target)
 
     def run_and_show_time():
@@ -81,7 +82,9 @@ def perform(
 
 def show(migrations_dir=migrations_dir_, state_file=state_file_):
     performed = get_performed_migrations(state_file)
-    new = get_all_migrations(migrations_dir)[len(performed):]
+    available = get_all_migrations(migrations_dir)
+    check_integrity(available, performed)
+    new = available[len(performed):]
 
     performed_header = 'Applied migrations:'
     new_header = 'New migrations:'
@@ -119,14 +122,15 @@ def get_performed_migrations(state_file):
         return []
 
 
-def get_migrations(available, performed, direction, target):
-
+def check_integrity(available, performed):
     for available_item, performed_item in itertools.zip_longest(
-        available, performed
+            available, performed
     ):
         if available_item != performed_item and performed_item is not None:
             raise MigrationError('migration order is corrupt')
 
+
+def get_migrations(available, performed, direction, target):
     if direction == 'down':
         migrations = performed.copy()
         migrations.reverse()
