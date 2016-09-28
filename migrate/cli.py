@@ -17,6 +17,12 @@ def entrypoint(argv=sys.argv[1:]):
                 'template_file',
             ])
             _runner.create(**method_args)
+        elif args['action'] == 'show':
+            method_args = _transform_args(args, [
+                'migrations_dir',
+                'template_file',
+            ])
+            _runner.show(**method_args)
         else:
             method_args = _transform_args(args, [
                 ('action', 'direction'),
@@ -61,6 +67,9 @@ def _configure_parser():
         help='name of new migration file'
     )
     action_create.set_defaults(action='create')
+
+    action_show = subparsers.add_parser('show')
+    action_show.set_defaults(action='show')
 
     action_up = subparsers.add_parser('up')
     action_up.add_argument(
