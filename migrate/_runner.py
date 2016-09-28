@@ -127,7 +127,18 @@ def check_integrity(available, performed):
             available, performed
     ):
         if available_item != performed_item and performed_item is not None:
-            raise MigrationError('migration order is corrupt')
+            break
+    else:
+        return
+
+    msg = """\
+migration order is corrupt.
+Expected '{performed}' in the directory.
+Got '{available}' instead.
+You must resolve the conflict manually.
+For more info run `migrate show`"""
+    msg = msg.format(performed=performed_item, available=available_item)
+    raise MigrationError(msg)
 
 
 def get_migrations(available, performed, direction, target):
