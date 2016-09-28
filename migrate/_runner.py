@@ -89,20 +89,16 @@ def show(migrations_dir=migrations_dir_, state_file=state_file_):
     performed_header = 'Applied migrations:'
     new_header = 'New migrations:'
 
-    performed_str = '\n'.join([
-        '-' * len(performed_header),
-        performed_header,
-        '-' * len(performed_header),
-        '\n'.join(performed),
-    ]) if performed else ''
+    def format_list(items, header):
+        return '\n'.join([
+            '-' * len(header),
+            header,
+            '-' * len(header),
+            '\n'.join(items),
+        ]) if items else ''
 
-    new_str = '\n'.join([
-        '-' * len(new_header),
-        new_header,
-        '-' * len(new_header),
-        '\n'.join(new),
-    ]) if new else ''
-
+    performed_str = format_list(performed, performed_header)
+    new_str = format_list(new, new_header)
     if performed_str and new_str:
         print(performed_str + '\n' + new_str)
     else:
