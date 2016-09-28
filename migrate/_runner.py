@@ -46,7 +46,7 @@ def perform(
         state_file=state_file_):
 
     if direction != 'up' and direction != 'down':
-        raise MigrationError('direction {} is invalid'.format(direction))
+        raise MigrationError('direction {} is invalid.'.format(direction))
 
     if isinstance(target, str) and target.isdecimal():
         number = int(target)
@@ -81,13 +81,9 @@ def perform(
 
 
 def show(migrations_dir=migrations_dir_, state_file=state_file_):
-    performed = get_performed_migrations(state_file)
-    available = get_all_migrations(migrations_dir)
-    check_integrity(available, performed)
-    new = available[len(performed):]
-
     performed_header = 'Applied migrations:'
     new_header = 'New migrations:'
+    available_header = 'Available migrations:'
 
     def format_list(items, header):
         return '\n'.join([
@@ -97,6 +93,21 @@ def show(migrations_dir=migrations_dir_, state_file=state_file_):
             '\n'.join(items),
         ]) if items else ''
 
+    performed = get_performed_migrations(state_file)
+    available = get_all_migrations(migrations_dir)
+    try:
+        check_integrity(available, performed)
+    except MigrationError as e:
+        info = e.args[1]
+        performed_str = format_list(performed, performed_header)
+        available_str = format_list(available, available_header)
+        raise MigrationError('\n'.join([
+            info,
+            performed_str,
+            available_str,
+        ]))
+
+    new = available[len(performed):]
     performed_str = format_list(performed, performed_header)
     new_str = format_list(new, new_header)
     if performed_str and new_str:
@@ -115,7 +126,7 @@ def get_all_migrations(migrations_dir):
         available.sort()
         return available
     except FileNotFoundError as e:
-        raise MigrationError('no migrations found') from e
+        raise MigrationError('no migrations found.') from e
 
 
 def get_performed_migrations(state_file):
@@ -135,14 +146,13 @@ def check_integrity(available, performed):
     else:
         return
 
-    msg = """\
+    info = """\
 migration order is corrupt.
 Expected '{performed}' in the directory.
 Got '{available}' instead.
-You must resolve the conflict manually.
-For more info run `migrate show`"""
-    msg = msg.format(performed=performed_item, available=available_item)
-    raise MigrationError(msg)
+You must resolve the conflict manually."""
+    info = info.format(performed=performed_item, available=available_item)
+    raise MigrationError(info + '\nFor more info run `migrate show`.', info)
 
 
 def get_migrations(available, performed, direction, target):
@@ -164,7 +174,7 @@ def get_migrations(available, performed, direction, target):
                 break
         else:
             raise MigrationError(
-                'migration with provided name {} not found'.format(target)
+                'migration with provided name {} not found.'.format(target)
             )
         migrations = migrations[:index + 1]
 
@@ -212,4 +222,4 @@ class MigrationError(Exception):
         self.message = message
 
     def __str__(self):
-        return 'Error: {}.'.format(self.message)
+        return 'Error: {}'.format(self.message)
