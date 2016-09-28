@@ -3,14 +3,14 @@ import re
 
 
 def version():
-    with open('migrate/__init__.py', 'r') as file:
-        file_content = file.read()
+    with open('migrate/__init__.py', 'r') as version_file:
+        file_content = version_file.read()
     pattern = r"""^__version__\s*=\s*['"]([^'"]*)['"]"""
     return re.search(pattern, file_content, re.M).group(1)
 
 
-with open('README.rst', 'r') as file:
-    readme = file.read()
+with open('README.rst', 'r') as readme_file:
+    readme = readme_file.read()
 
 setup(
     name='migrations',
