@@ -88,17 +88,25 @@ def show(migrations_dir=migrations_dir_, state_file=state_file_):
 
     performed_header = 'Applied migrations:'
     new_header = 'New migrations:'
-    print('\n'.join([
+
+    performed_str = '\n'.join([
         '-' * len(performed_header),
         performed_header,
         '-' * len(performed_header),
         '\n'.join(performed),
+    ]) if performed else ''
 
+    new_str = '\n'.join([
         '-' * len(new_header),
         new_header,
         '-' * len(new_header),
         '\n'.join(new),
-    ]))
+    ]) if new else ''
+
+    if performed_str and new_str:
+        print(performed_str + '\n' + new_str)
+    else:
+        print(performed_str + new_str)
 
 
 def get_all_migrations(migrations_dir):
@@ -185,7 +193,7 @@ def run(name, directory, direction):
     action()
     duration = time.time() - started
 
-    print('done(time: {:.3f}s)'.format(duration))
+    print('done (time: {:.3f}s)'.format(duration))
     return duration
 
 
