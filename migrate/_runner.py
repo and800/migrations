@@ -140,7 +140,7 @@ def show(
             info,
             performed_str,
             available_str,
-        ]))
+        ])) from e
 
     new = available[len(performed):]
     performed_str = format_list(performed, performed_header)
