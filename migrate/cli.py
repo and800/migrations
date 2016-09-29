@@ -1,9 +1,19 @@
+"""
+CLI frontend for package API.
+"""
 import sys
 import argparse
 from . import _runner, __version__
 
 
 def entrypoint(argv=sys.argv[1:]):
+    """
+    Parse arguments and perform appropriate action.
+    Wrap it into `sys.exit()` call.
+
+    :param argv: list of arguments
+    :return: status code 0 if succeeded or exception object if failed
+    """
     parser = _configure_parser()
     args = vars(parser.parse_args(argv))
 

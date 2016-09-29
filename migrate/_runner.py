@@ -1,3 +1,6 @@
+"""
+Package API is defined here.
+"""
 import time
 import os
 import json
@@ -10,7 +13,19 @@ migrations_dir_ = 'migrations/'
 state_file_ = migrations_dir_ + '.state'
 
 
-def create(name, migrations_dir=migrations_dir_, template_file=None):
+def create(
+        name: str,
+        migrations_dir: str = migrations_dir_,
+        template_file: str = None) -> None:
+    """
+    Create new migration file named
+    {timestamp}_{name}.py
+
+    :param name: will be part of created file name
+    :param migrations_dir: file destination
+    :param template_file: contents of file to be created
+    :return: None
+    """
     if template_file is None:
         template = """\
 def up():
@@ -40,10 +55,21 @@ def down():
 
 
 def perform(
-        direction='up',
-        target=None,
-        migrations_dir=migrations_dir_,
-        state_file=state_file_):
+        direction: str = 'up',
+        target: str = None,
+        migrations_dir: str = migrations_dir_,
+        state_file: str = state_file_) -> None:
+    """
+    Read current database state, apply (or revert) specified
+    migrations, and update the state.
+
+    :param direction: 'up' or 'down'
+    :param target: name of last migration which wil be performed
+        (or reverted) or number of migrations to perform
+    :param migrations_dir: location of migration files
+    :param state_file: path to state file
+    :return: None
+    """
 
     if direction != 'up' and direction != 'down':
         raise MigrationError('direction {} is invalid.'.format(direction))
@@ -80,7 +106,16 @@ def perform(
     ))
 
 
-def show(migrations_dir=migrations_dir_, state_file=state_file_):
+def show(
+        migrations_dir: str = migrations_dir_,
+        state_file: str = state_file_) -> None:
+    """
+    Print current database state to stdout.
+
+    :param migrations_dir: location of migration files
+    :param state_file: path to state file
+    :return: None
+    """
     performed_header = 'Applied migrations:'
     new_header = 'New migrations:'
     available_header = 'Available migrations:'
@@ -217,6 +252,10 @@ def set_state(direction, old_state, migrations, state_file):
 
 
 class MigrationError(Exception):
+    """
+    Exceptions for all user errors. Any such an error
+    is formatted and printed to stderr.
+    """
     def __init__(self, message, *args):
         super(MigrationError, self).__init__(message, *args)
         self.message = message
