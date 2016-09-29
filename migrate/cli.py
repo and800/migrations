@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 CLI frontend for package API.
 """
@@ -114,3 +115,7 @@ def _transform_args(args, required):
         if value is not None:
             result[key] = value
     return result
+
+
+if __name__ == '__main__':
+    sys.exit(entrypoint())
