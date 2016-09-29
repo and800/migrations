@@ -9,13 +9,15 @@ import sys
 import itertools
 from importlib import util as import_util
 
-migrations_dir_ = 'migrations/'
-state_file_ = migrations_dir_ + '.state'
+MIGRATIONS_DIR = 'migrations/'
+STATE_FILE = MIGRATIONS_DIR + '.state'
+DIRECTION_UP = 'up'
+DIRECTION_DOWN = 'down'
 
 
 def create(
         name: str,
-        migrations_dir: str = migrations_dir_,
+        migrations_dir: str = MIGRATIONS_DIR,
         template_file: str = None) -> None:
     """
     Create new migration file named
@@ -55,10 +57,10 @@ def down():
 
 
 def perform(
-        direction: str = 'up',
+        direction: str = DIRECTION_UP,
         target: str = None,
-        migrations_dir: str = migrations_dir_,
-        state_file: str = state_file_) -> None:
+        migrations_dir: str = MIGRATIONS_DIR,
+        state_file: str = STATE_FILE) -> None:
     """
     Read current database state, apply (or revert) specified
     migrations, and update the state.
@@ -71,7 +73,7 @@ def perform(
     :return: None
     """
 
-    if direction != 'up' and direction != 'down':
+    if direction != DIRECTION_UP and direction != DIRECTION_DOWN:
         raise MigrationError('direction {} is invalid.'.format(direction))
 
     if isinstance(target, str) and target.isdecimal():
@@ -101,14 +103,14 @@ def perform(
     set_state(direction, performed, migrations, state_file)
 
     print('\nMigrations have been {action}. Total time: {time:.3f}s'.format(
-        action='reverted' if direction == 'down' else 'applied',
+        action='reverted' if direction == DIRECTION_DOWN else 'applied',
         time=total_time
     ))
 
 
 def show(
-        migrations_dir: str = migrations_dir_,
-        state_file: str = state_file_) -> None:
+        migrations_dir: str = MIGRATIONS_DIR,
+        state_file: str = STATE_FILE) -> None:
     """
     Print current database state to stdout.
 
@@ -191,14 +193,14 @@ You must resolve the conflict manually."""
 
 
 def get_migrations(available, performed, direction, target):
-    if direction == 'down':
+    if direction == DIRECTION_DOWN:
         migrations = performed.copy()
         migrations.reverse()
     else:
         migrations = available[len(performed):]
 
     if target is None:
-        if direction == 'down':
+        if direction == DIRECTION_DOWN:
             return migrations[:1]
         return migrations
     if isinstance(target, int):
@@ -225,7 +227,7 @@ def run(name, directory, direction):
     import_spec.loader.exec_module(module)
 
     print('{action} {name}...'.format(
-        action='Reverting' if direction == 'down' else 'Applying',
+        action='Reverting' if direction == DIRECTION_DOWN else 'Applying',
         name=name,
     ), end='', flush=True)
 
@@ -239,7 +241,7 @@ def run(name, directory, direction):
 
 
 def set_state(direction, old_state, migrations, state_file):
-    if direction == 'down':
+    if direction == DIRECTION_DOWN:
         state = old_state[:-len(migrations)]
     else:
         state = old_state + migrations
