@@ -1,5 +1,5 @@
-from setuptools import setup
 import re
+from setuptools import setup
 
 
 def version():
