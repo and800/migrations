@@ -4,3 +4,4 @@ wheel~=0.29
 twine~=1.8
 pylint~=1.6
 pep8~=1.7
+flake8~=3.0
