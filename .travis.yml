@@ -6,6 +6,8 @@ python:
   - "3.5"
   #- "nightly"
 
+cache: pip
+
 install:
   - pip install flake8
 
