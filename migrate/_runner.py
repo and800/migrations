@@ -8,13 +8,10 @@ import fnmatch
 import sys
 import itertools
 from importlib import util as import_util
-
 MIGRATIONS_DIR = 'migrations/'
 STATE_FILE = MIGRATIONS_DIR + '.state'
 DIRECTION_UP = 'up'
 DIRECTION_DOWN = 'down'
-
-
 def create(
         name: str,
         migrations_dir: str = MIGRATIONS_DIR,
@@ -54,8 +51,6 @@ def down():
     with open(filename, 'w') as file:
         file.write(template)
     print('File \'{}\' has been created.'.format(filename))
-
-
 def perform(
         direction: str = DIRECTION_UP,
         target: str = None,
@@ -106,8 +101,6 @@ def perform(
         action='reverted' if direction == DIRECTION_DOWN else 'applied',
         time=total_time
     ))
-
-
 def show(
         migrations_dir: str = MIGRATIONS_DIR,
         state_file: str = STATE_FILE) -> None:
@@ -151,8 +144,6 @@ def show(
         print(performed_str + '\n' + new_str)
     else:
         print(performed_str + new_str)
-
-
 def get_all_migrations(migrations_dir):
     try:
         available = [
@@ -164,16 +155,12 @@ def get_all_migrations(migrations_dir):
         return available
     except FileNotFoundError as e:
         raise MigrationError('no migrations found.') from e
-
-
 def get_performed_migrations(state_file):
     try:
         with open(state_file, 'r') as file:
             return json.load(file)
     except FileNotFoundError:
         return []
-
-
 def check_integrity(available, performed):
     for available_item, performed_item in itertools.zip_longest(
             available, performed
@@ -190,8 +177,6 @@ Got '{available}' instead.
 You must resolve the conflict manually."""
     info = info.format(performed=performed_item, available=available_item)
     raise MigrationError(info + '\nFor more info run `migrate show`.', info)
-
-
 def get_migrations(available, performed, direction, target):
     if direction == DIRECTION_DOWN:
         migrations = performed.copy()
@@ -216,8 +201,6 @@ def get_migrations(available, performed, direction, target):
         migrations = migrations[:index + 1]
 
     return migrations
-
-
 def run(name, directory, direction):
     import_spec = import_util.spec_from_file_location(
         name,
@@ -238,8 +221,6 @@ def run(name, directory, direction):
 
     print('done (time: {:.3f}s)'.format(duration))
     return duration
-
-
 def set_state(direction, old_state, migrations, state_file):
     if direction == DIRECTION_DOWN:
         state = old_state[:-len(migrations)]
@@ -251,8 +232,6 @@ def set_state(direction, old_state, migrations, state_file):
             file,
             indent=2
         )
-
-
 class MigrationError(Exception):
     """
     Exceptions for all user errors. Any such an error
