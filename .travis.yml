@@ -18,8 +18,7 @@ deploy:
   provider: pypi
   user: and800
   password: $PYPI_PASSWORD
-  server: https://testpypi.python.org/pypi
   distributions: "sdist bdist_wheel"
   on:
-    branch: ci
+    branch: "0.x"
     python: "3.5"
