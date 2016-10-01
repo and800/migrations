@@ -6,7 +6,7 @@ Inspired by `node migrations <https://github.com/tj/node-migrate>`_.
 
 Status
 ------
-The project is in alpha now. Bugs and breaking changes will occur.
+The project is in beta now. Bugs and breaking changes may occur.
 
 Requirements
 ------------
@@ -34,11 +34,13 @@ Usage
     usage: migrate [options] [action]
 
     actions:
-      up     [-h] [NAME|COUNT]   (default) perform COUNT migrations or till given NAME
-                                 (by default perform all available)
-      down   [-h] [NAME|COUNT]   revert COUNT migrations or till given NAME
-                                 (by default revert one)
+      up     [-h] [NAME|COUNT]   (default) perform COUNT migrations or till
+                                 given NAME (by default perform all available)
+      down   [-h] [NAME|COUNT]   revert COUNT migrations or till
+                                 given NAME (by default revert one)
       create [-h]  NAME          create new migration file
+
+      show   [-h]                print all migrations in chronological order
 
     options:
       -h, --help                 show this help message and exit

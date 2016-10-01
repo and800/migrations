@@ -1,9 +1,20 @@
+#!/usr/bin/env python3
+"""
+CLI frontend for package API.
+"""
 import sys
 import argparse
 from . import _runner, __version__
 
 
 def entrypoint(argv=sys.argv[1:]):
+    """
+    Parse arguments and perform appropriate action.
+    Wrap it into `sys.exit()` call.
+
+    :param argv: list of arguments
+    :return: status code 0 if succeeded or exception object if failed
+    """
     parser = _configure_parser()
     args = vars(parser.parse_args(argv))
 
@@ -17,6 +28,12 @@ def entrypoint(argv=sys.argv[1:]):
                 'template_file',
             ])
             _runner.create(**method_args)
+        elif args['action'] == 'show':
+            method_args = _transform_args(args, [
+                'migrations_dir',
+                'template_file',
+            ])
+            _runner.show(**method_args)
         else:
             method_args = _transform_args(args, [
                 ('action', 'direction'),
@@ -62,6 +79,9 @@ def _configure_parser():
     )
     action_create.set_defaults(action='create')
 
+    action_show = subparsers.add_parser('show')
+    action_show.set_defaults(action='show')
+
     action_up = subparsers.add_parser('up')
     action_up.add_argument(
         'target', nargs='?',
@@ -95,3 +115,7 @@ def _transform_args(args, required):
         if value is not None:
             result[key] = value
     return result
+
+
+if __name__ == '__main__':
+    sys.exit(entrypoint())

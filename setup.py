@@ -1,16 +1,16 @@
-from setuptools import setup
 import re
+from setuptools import setup
 
 
 def version():
-    with open('migrate/__init__.py', 'r') as file:
-        file_content = file.read()
+    with open('migrate/__init__.py', 'r') as version_file:
+        file_content = version_file.read()
     pattern = r"""^__version__\s*=\s*['"]([^'"]*)['"]"""
     return re.search(pattern, file_content, re.M).group(1)
 
 
-with open('README.rst', 'r') as file:
-    readme = file.read()
+with open('README.rst', 'r') as readme_file:
+    readme = readme_file.read()
 
 setup(
     name='migrations',
@@ -22,7 +22,7 @@ setup(
     author_email='andriy.maletsky@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
