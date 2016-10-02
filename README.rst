@@ -69,12 +69,14 @@ Simple migration example:
     def down():
         db.rpop('used_libraries', 'migrations')
 
-A bit more complex example. Let's assume that in current
-working directory we have module named :code:`db`, which contains
-singleton object responsible for DB connection, for example
+Current working directory is prepended to :code:`sys.path`, so any
+:code:`import` statement in migration file tries to find requested
+module in working directory at first. You can use this to manage
+database access for your both app and migrations with single piece
+of code. See an example. Let's assume that in working directory
+we have module named :code:`db`, which contains singleton object
+responsible for DB connection, for example
 `PyMySQL <https://github.com/PyMySQL/PyMySQL>`_ Connection object.
-Current working directory is the first place to be scanned for
-modules to import.
 
 .. code-block:: python
 
