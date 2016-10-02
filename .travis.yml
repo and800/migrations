@@ -6,6 +6,9 @@ python:
   - "3.5"
   #- "nightly"
 
+branches:
+  except: oop
+
 cache: pip
 
 install:
