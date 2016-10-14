@@ -1,6 +1,9 @@
 Migrations
 ==========
 
+.. image:: https://img.shields.io/pypi/v/migrations.svg?maxAge=2592000
+  :target: https://pypi.python.org/pypi/migrations
+
 Simple, database-agnostic migration tool for Python applications.
 Inspired by `node migrations <https://github.com/tj/node-migrate>`_.
 
