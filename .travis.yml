@@ -9,7 +9,7 @@ python:
 cache: pip
 
 install:
-  - pip install flake8
+  - pip install -r ci/requirements.txt
 
 script:
   - flake8 migrate/ setup.py

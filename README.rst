@@ -1,12 +1,26 @@
 Migrations
 ==========
 
-Simple, cross-database migration tool for Python applications.
+.. image:: https://img.shields.io/pypi/v/migrations.svg?maxAge=2592000
+  :target: https://pypi.python.org/pypi/migrations
+
+Simple, database-agnostic migration tool for Python applications.
 Inspired by `node migrations <https://github.com/tj/node-migrate>`_.
 
 Status
 ------
 The project is in beta now. Bugs and breaking changes may occur.
+
+Features
+--------
++ No specific database requirements, use it for anything you call database.
++ Pretty simple, just generate migration script and define self-explanatory
+  ``up()`` and ``down()`` functions there.
++ Use imports in your migration scripts to load database bindings. Talk to the
+  database the same way your application does.
++ Stores the sequence of already performed migrations. If the sequence does not
+  match scripts in migrations directory (e.g. after merge), aborts and warns user.
++ *TBD: Deeply configurable, including resources acquiring and releasing.*
 
 Requirements
 ------------
@@ -19,13 +33,9 @@ Installation
     $ pip install migrations
 
 Notice, this distribution provides package and executable
-script named :code:`migrate`, so check if it does not mess with
+script named ``migrate``, so check if it does not mess with
 existing packages/scripts. Generally, you should neither install
 this tool globally, nor install several migration tools for one project.
-
-Features
---------
-TBD
 
 Usage
 -----
@@ -52,7 +62,7 @@ Usage
       -t PATH, --template-file PATH
                                  location of template file for new migrations
 
-Each migration file must define functions :code:`up()` and :code:`down()`
+Each migration file must define functions ``up()`` and ``down()``
 without required arguments.
 
 Simple migration example:
@@ -69,12 +79,14 @@ Simple migration example:
     def down():
         db.rpop('used_libraries', 'migrations')
 
-A bit more complex example. Let's assume that in current
-working directory we have module named :code:`db`, which contains
-singleton object responsible for DB connection, for example
+Current working directory is prepended to ``sys.path``, so any
+``import`` statement in migration file tries to find requested
+module in working directory at first. You can use this to manage
+database access for your both app and migrations with single piece
+of code. See an example. Let's assume that in working directory
+we have module named ``db``, which contains singleton object
+responsible for DB connection, for example
 `PyMySQL <https://github.com/PyMySQL/PyMySQL>`_ Connection object.
-Current working directory is the first place to be scanned for
-modules to import.
 
 .. code-block:: python
 
